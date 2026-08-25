@@ -1,6 +1,6 @@
-[![✗](https://img.shields.io/badge/Release-v2.0.0-ffb600.svg?style=for-the-badge)](https://github.com/fa-ponce/tp-tla-2026/releases)
+[![✗](https://img.shields.io/badge/Release-v1.0.0-ffb600.svg?style=for-the-badge)](https://github.com/fa-ponce/tp-tla-2026/releases)
 
-[![✗](https://github.com/fa-ponce/tp-tla-2026/actions/workflows/pipeline.yaml/badge.svg?branch=production)](https://github.com/fa-ponce/tp-tla-2026/actions/workflows/pipeline.yaml)
+[![✗](https://github.com/fa-ponce/tp-tla-2026/actions/workflows/pipeline.yaml/badge.svg?branch=development)](https://github.com/fa-ponce/tp-tla-2026/actions/workflows/pipeline.yaml)
 
 # Flex-Bison-Compiler
 
