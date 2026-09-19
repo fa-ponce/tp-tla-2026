@@ -41,7 +41,7 @@ extern CompilationStatus InLexemeAction();
 extern CompilationStatus CurlyBracketLexemeAction(TokenLabel label);
 extern CompilationStatus ParenthesisLexemeAction(TokenLabel label);
 extern CompilationStatus BracketLexemeAction(TokenLabel label);
-extern CompilationStatus ColonLexemeAction();
+extern CompilationStatus CommaLexemeAction();
 extern CompilationStatus SemiColonLexemeAction();
 extern CompilationStatus EqualLexemeAction();
 extern CompilationStatus NotEqualLexemeAction();
@@ -133,7 +133,7 @@ NUMBER              {digit}+(\.{digit}+)?
 "<"             { return ComparisonOperator(LOWER_THAN_SIGN); }
 ">"             { return ComparisonOperator(HIGHER_THAN_SIGN); }
 "<="            { return ComparisonOperator(LOWER_OR_EQUAL_THAN_SIGN); }
-">="            { return ComparisonOperator(GREATER_OR_EQUAL_THAN_SIGN); }
+">="            { return ComparisonOperator(HIGHER_OR_EQUAL_THAN_SIGN); }
 
 {STRING}        { return StringLexemeAction(); }
 {NUMBER}        { return NumberLexemeAction(); }

@@ -26,8 +26,9 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %union {
 	/** Terminals. */
 
-	signed int integer;
 	TokenLabel token;
+	char* string;
+	double number;
 
 	/** Non-terminals. */
 
@@ -50,17 +51,57 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %destructor { destroyFactor($$); } <factor>
 
 /** Terminals. */
-%token <integer> INTEGER
-%token <token> ADD
-%token <token> CLOSE_BRACE
-%token <token> CLOSE_COMMENT
-%token <token> CLOSE_PARENTHESIS
-%token <token> DIV
-%token <token> MUL
-%token <token> OPEN_BRACE
-%token <token> OPEN_COMMENT
-%token <token> OPEN_PARENTHESIS
-%token <token> SUB
+%token <token>  LOAD
+%token <token>  SAVE
+%token <token>  FILTER
+%token <token>  MUTATE
+%token <token>  SELECT
+%token <token>  SORT
+%token <token>  BY
+%token <token>  LIMIT
+%token <token>  ASC
+%token <token>  DESC
+%token <token>  IF
+%token <token>  THEN
+%token <token>  ELSE
+%token <token>  APPLY
+%token <token>  AND
+%token <token>  OR
+%token <token>  NOT
+%token <token>  LET
+%token <token>  FUNCTION 
+%token <token>  RETURN
+%token <token>  PIPELINE
+%token <token>  REQUIRE
+%token <token>  FOR
+%token <token>  IN
+
+%token <token>  OPEN_CURLY_BRACKET
+%token <token>  CLOSE_CURLY_BRACKET
+%token <token>  OPEN_PARENTHESIS
+%token <token>  CLOSE_PARENTHESIS
+%token <token>  OPEN_BRACKET
+%token <token>  CLOSE_BRACKET
+
+%token <token>  COMMA
+%token <token>  SEMICOLON
+
+%token <token>  EQUAL
+%token <token>  NOT_EQUAL
+
+%token <token>  SUB
+%token <token>  MUL
+%token <token>  DIV
+%token <token>  ADD 
+
+%token <token>  LOWER_THAN_SIGN
+%token <token>  HIGHER_THAN_SIGN
+%token <token>  LOWER_OR_EQUAL_THAN_SIGN
+%token <token>  HIGHER_OR_EQUAL_THAN_SIGN
+
+%token <number> NUMBER
+%token <string> STRING
+%token <string> IDENT
 
 %token <token> IGNORED
 %token <token> UNKNOWN
