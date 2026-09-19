@@ -14,7 +14,7 @@ A base compiler example, developed with Flex and Bison.
 
 ## Requirements
 
-* [Docker v28.3.2](https://www.docker.com/)
+* [Docker v29.7.2](https://www.docker.com/)
 
 ## Configuration
 
