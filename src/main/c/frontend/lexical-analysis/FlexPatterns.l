@@ -64,6 +64,18 @@ extern CompilationStatus EOFLexemeAction();
 
 
 /**
+ * Flex options.
+ *
+ * Palabras reservadas y conectores se aceptan con cualquier combinación de
+ * mayúsculas/minúsculas (p. ej. "Load", "LoAd" y "LOAD" son equivalentes).
+ * No afecta a IDENT/STRING/NUMBER, que ya matchean con clases POSIX.
+ *
+ * @see https://westes.github.io/flex/manual/Options.html
+ */
+%option caseless
+
+
+/**
  * Reusable patterns.
  *
  * @see https://westes.github.io/flex/manual/Matching.html
@@ -87,23 +99,23 @@ NUMBER              {digit}+(\.{digit}+)?
 
 "//"[^\n]*      { return IgnoredLexemeAction(); }
 
-"LOAD"          { return LoadLexemeAction(); }
-"SAVE"          { return SaveLexemeAction(); }
-"FILTER"        { return FilterLexemeAction(); }
-"MUTATE"        { return MutateLexemeAction(); }
-"SELECT"        { return SelectLexemeAction(); }
-"SORT"          { return SortLexemeAction(); }
-"BY"            { return ByLexemeAction(); }
-"LIMIT"         { return LimitLexemeAction(); }
-"ASC"           { return AscLexemeAction(); }
-"DESC"          { return DescLexemeAction(); }
-"IF"            { return IfLexemeAction(); }
-"THEN"          { return ThenLexemeAction(); }
-"ELSE"          { return ElseLexemeAction(); }
-"APPLY"         { return ApplyLexemeAction(); }
-"AND"           { return AndLexemeAction(); }
-"OR"            { return OrLexemeAction(); }
-"NOT"           { return NotLexemeAction(); }
+"load"          { return LoadLexemeAction(); }
+"save"          { return SaveLexemeAction(); }
+"filter"        { return FilterLexemeAction(); }
+"mutate"        { return MutateLexemeAction(); }
+"select"        { return SelectLexemeAction(); }
+"sort"          { return SortLexemeAction(); }
+"by"            { return ByLexemeAction(); }
+"limit"         { return LimitLexemeAction(); }
+"asc"           { return AscLexemeAction(); }
+"desc"          { return DescLexemeAction(); }
+"if"            { return IfLexemeAction(); }
+"then"          { return ThenLexemeAction(); }
+"else"          { return ElseLexemeAction(); }
+"apply"         { return ApplyLexemeAction(); }
+"and"           { return AndLexemeAction(); }
+"or"            { return OrLexemeAction(); }
+"not"           { return NotLexemeAction(); }
 
 "let"           { return LetLexemeAction(); }
 "function"      { return FunctionLexemeAction(); }
