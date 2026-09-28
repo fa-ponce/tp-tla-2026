@@ -1,0 +1,9 @@
+let tasa = 0.21;
+
+pipeline con_impuesto() require tasa >= 0 AND tasa <= 1 {
+    MUTATE final = precio * (1 + tasa)
+}
+
+LOAD "in.csv"
+APPLY con_impuesto()
+SAVE "out.csv"

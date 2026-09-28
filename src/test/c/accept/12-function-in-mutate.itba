@@ -1,0 +1,5 @@
+function recargo(x) { return x * 0.05; }
+
+LOAD "in.csv"
+MUTATE final = precio + recargo(precio)
+SAVE "out.csv"

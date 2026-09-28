@@ -1,0 +1,5 @@
+for (tasa, ruta) in [[0.10, "top_010.csv"], [0.27, "top_027.csv"]] {
+    LOAD "productos.csv"
+    MUTATE final = precio * (1 + tasa)
+    SAVE ruta
+}

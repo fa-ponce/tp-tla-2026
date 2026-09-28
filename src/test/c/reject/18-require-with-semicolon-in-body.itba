@@ -1,0 +1,8 @@
+pipeline aplicar_tasa(tasa) {
+    MUTATE final = precio * (1 + tasa)
+    require tasa >= 0;
+}
+
+LOAD "in.csv"
+APPLY aplicar_tasa(0.21)
+SAVE "out.csv"

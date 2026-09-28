@@ -349,6 +349,15 @@ CompilationStatus ComparisonOperator(TokenLabel label){
 	return status;
 }
 
+CompilationStatus BooleanLexemeAction(bool value){
+	Token * token = createToken(_lexicalAnalyzer, BOOLEAN);
+	token->semanticValue->boolean = value;
+	_logTokenAction(__FUNCTION__, token);
+	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
+	destroyToken(token);
+	return status;
+}
+
 CompilationStatus StringLexemeAction(){
 	Token * token = createToken(_lexicalAnalyzer, STRING);
 	int length = token->length - 2; // sin las comillas
@@ -374,6 +383,15 @@ CompilationStatus NumberLexemeAction(){
 CompilationStatus IdentLexemeAction(){
 	Token * token = createToken(_lexicalAnalyzer, IDENT);
 	token->semanticValue->string = strdup(token->lexeme);
+	_logTokenAction(__FUNCTION__, token);
+	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
+	destroyToken(token);
+	return status;
+}
+
+CompilationStatus ExternalParamLexemeAction(){
+	Token * token = createToken(_lexicalAnalyzer, EXTERNAL_PARAM);
+	token->semanticValue->string = strdup(token->lexeme + 1); // sin el '$'
 	_logTokenAction(__FUNCTION__, token);
 	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
 	destroyToken(token);

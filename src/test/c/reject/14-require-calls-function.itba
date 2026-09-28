@@ -1,0 +1,12 @@
+// PENDIENTE: hoy el compilador lo acepta (status 0) porque todavía no está
+// implementado el análisis semántico del backend. Es sintácticamente válido.
+
+function recargo(x) { return x * 0.05; }
+
+pipeline aplicar_tasa(tasa) require recargo(tasa) < 1 {
+    MUTATE final = precio_base * (1 + tasa)
+}
+
+LOAD "in.csv"
+APPLY aplicar_tasa(0.21)
+SAVE "out.csv"

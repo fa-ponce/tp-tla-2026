@@ -1,0 +1,3 @@
+load "in.csv"
+Filter activo = TRUE and edad >= 18
+Save "out.csv"

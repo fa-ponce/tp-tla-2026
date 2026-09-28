@@ -1,0 +1,8 @@
+pipeline aplicar_tasa(tasa) {
+    MUTATE final = precio * (1 + tasa)
+    SELECT nombre, final
+}
+
+LOAD "productos.csv"
+APPLY aplicar_tasa(0.21)
+SAVE "out.csv"

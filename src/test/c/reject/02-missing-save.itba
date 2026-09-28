@@ -1,0 +1,2 @@
+LOAD "in.csv"
+FILTER edad > 18

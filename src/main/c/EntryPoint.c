@@ -1,5 +1,6 @@
-#include "backend/code-generation/Generator.h"
-#include "backend/domain-specific/Calculator.h"
+// Backend disabled until it's rewritten for the TabularDSL AST.
+// #include "backend/code-generation/Generator.h"
+// #include "backend/domain-specific/Calculator.h"
 #include "frontend/Frontend.h"
 #include "frontend/lexical-analysis/FlexActions.h"
 #include "frontend/syntactic-analysis/BisonActions.h"
@@ -27,15 +28,17 @@ const int main(const int length, const char ** arguments) {
 		initializeAbstractSyntaxTreeModule(),
 		initializeFlexActionsModule(lexicalAnalyzer),
 		initializeBisonActionsModule(&compilerState),
-		initializeFrontendModule(lexicalAnalyzer),
-		initializeCalculatorModule(),
-		initializeGeneratorModule()
+		initializeFrontendModule(lexicalAnalyzer)
+		// initializeCalculatorModule(),
+		// initializeGeneratorModule()
 	};
 	CompilationStatus compilationStatus = executeSyntacticAnalysis();
 	Program * program = compilerState.abstractSyntaxtTree;
 	if (compilationStatus == SUCCEEDED) {
 		// ----------------------------------------------------------------------------------------
 		// Beginning of the Backend... ------------------------------------------------------------
+		logInformation(logger, "The syntactic-analysis phase accepts the input program.");
+		/*
 		logDebugging(logger, "Computing expression value...");
 		ComputationResult computationResult = executeCalculator(&compilerState);
 		if (computationResult.succeeded) {
@@ -46,6 +49,7 @@ const int main(const int length, const char ** arguments) {
 			logError(logger, "The computation phase rejects the input program.");
 			compilationStatus = FAILED;
 		}
+		*/
 		// ...end of the Backend. -----------------------------------------------------------------
 		// ----------------------------------------------------------------------------------------
 	}

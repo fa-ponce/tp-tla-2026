@@ -47,9 +47,11 @@ extern CompilationStatus EqualLexemeAction();
 extern CompilationStatus NotEqualLexemeAction();
 extern CompilationStatus ArithmeticOperatorLexemeAction(TokenLabel label);
 extern CompilationStatus ComparisonOperator(TokenLabel label);
+extern CompilationStatus BooleanLexemeAction(bool value);
 extern CompilationStatus StringLexemeAction();
 extern CompilationStatus NumberLexemeAction();
 extern CompilationStatus IdentLexemeAction();
+extern CompilationStatus ExternalParamLexemeAction();
 extern CompilationStatus IgnoredLexemeAction();
 extern CompilationStatus UnknownLexemeAction();
 extern CompilationStatus EOFLexemeAction();
@@ -125,6 +127,9 @@ NUMBER              {digit}+(\.{digit}+)?
 "for"           { return ForLexemeAction(); }
 "in"            { return InLexemeAction(); }
 
+"true"          { return BooleanLexemeAction(true); }
+"false"         { return BooleanLexemeAction(false); }
+
 "{"             { return CurlyBracketLexemeAction(OPEN_CURLY_BRACKET); }
 "}"             { return CurlyBracketLexemeAction(CLOSE_CURLY_BRACKET); }
 "("             { return ParenthesisLexemeAction(OPEN_PARENTHESIS); }
@@ -150,6 +155,7 @@ NUMBER              {digit}+(\.{digit}+)?
 {STRING}        { return StringLexemeAction(); }
 {NUMBER}        { return NumberLexemeAction(); }
 {IDENT}         { return IdentLexemeAction();  }
+"$"{IDENT}      { return ExternalParamLexemeAction(); }
 {WHITESPACE}    { return IgnoredLexemeAction(); }
 
 .               { return UnknownLexemeAction(); }

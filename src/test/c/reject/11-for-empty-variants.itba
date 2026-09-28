@@ -1,0 +1,4 @@
+for tasa in [] {
+    LOAD "in.csv"
+    SAVE "out.csv"
+}

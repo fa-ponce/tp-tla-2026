@@ -1,0 +1,5 @@
+for tasa in [0.10, 0.21, 0.27] {
+    LOAD "productos.csv"
+    MUTATE final = precio * (1 + tasa)
+    SAVE "top_productos_" + tasa + ".csv"
+}

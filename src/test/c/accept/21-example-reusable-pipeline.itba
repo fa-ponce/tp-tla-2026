@@ -1,0 +1,10 @@
+pipeline aplicar_impuesto(tasa) require tasa >= 0 AND tasa <= 1 {
+    MUTATE precio_final = precio_base * (1 + tasa)
+    SELECT nombre, precio_final
+}
+
+LOAD "products.csv"
+APPLY aplicar_impuesto(0.21)
+SORT BY precio_final DESC
+LIMIT 10
+SAVE "top_products.csv"

@@ -1,0 +1,20 @@
+let tasa_base = 0.21;
+
+function recargo(precio) {
+    return precio * 0.05;
+}
+
+pipeline aplicar_impuesto(tasa) require tasa >= 0 AND tasa <= 1 {
+    MUTATE precio_final = IF precio > 1000
+                          THEN precio * (1 + tasa) + recargo(precio)
+                          ELSE precio * (1 + tasa)
+    SELECT nombre, precio_final
+}
+
+for tasa in [0.10, tasa_base, 0.27] {
+    LOAD "products.csv"
+    APPLY aplicar_impuesto(tasa)
+    SORT BY precio_final DESC
+    LIMIT 10
+    SAVE "top_products.csv"
+}

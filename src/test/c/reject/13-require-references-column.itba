@@ -1,0 +1,10 @@
+// PENDIENTE: hoy el compilador lo acepta (status 0) porque todavía no está
+// implementado el análisis semántico del backend. Es sintácticamente válido.
+
+pipeline aplicar_tasa(tasa) require precio_base > 0 {
+    MUTATE final = precio_base * (1 + tasa)
+}
+
+LOAD "in.csv"
+APPLY aplicar_tasa(0.21)
+SAVE "out.csv"

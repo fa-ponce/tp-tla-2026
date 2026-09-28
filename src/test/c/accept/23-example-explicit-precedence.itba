@@ -1,0 +1,5 @@
+LOAD "requests.csv"
+FILTER NOT (source_ip = "192.168.1.45") AND (score >= 0.5 OR trusted = true)
+SELECT source_ip, path, score
+SORT BY score ASC
+SAVE "filtered_requests.csv"

@@ -1,0 +1,6 @@
+// PENDIENTE: hoy el compilador lo acepta (status 0) porque todavía no está
+// implementado el análisis semántico del backend. Es sintácticamente válido.
+
+LOAD "in.csv"
+MUTATE x = nombre * 2
+SAVE "out.csv"

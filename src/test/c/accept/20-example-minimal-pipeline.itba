@@ -1,0 +1,9 @@
+// Cargar el archivo de usuarios:
+LOAD "users.csv"
+
+// Quedarse solo con los adultos activos:
+FILTER age >= 18 AND status = "active"
+
+// Proyectar una sola columna y guardar:
+SELECT email
+SAVE "active_adults.csv"

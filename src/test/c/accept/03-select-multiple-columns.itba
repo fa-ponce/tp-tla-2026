@@ -1,0 +1,3 @@
+LOAD "in.csv"
+SELECT id, nombre, edad
+SAVE "out.csv"

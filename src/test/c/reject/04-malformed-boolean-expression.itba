@@ -1,0 +1,3 @@
+LOAD "in.csv"
+FILTER precio >
+SAVE "out.csv"
