@@ -33,4 +33,7 @@ bool set_value(ht* table, char* key, void* value);
 
 size_t get_count(ht* table);
 
+// Iterador de hashMap
+void ht_foreach(ht* table, void (*fn)(void*));
+
 #endif

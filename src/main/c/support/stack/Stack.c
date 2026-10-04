@@ -56,6 +56,6 @@ void* peek(stack* stk){
 }
 
 bool is_empty(stack* stk){
-   return stk->size == 0;
+   return stk == NULL || stk->size == 0;
 }
 

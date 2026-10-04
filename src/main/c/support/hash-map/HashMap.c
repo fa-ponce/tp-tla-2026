@@ -129,3 +129,11 @@ bool set_value(ht* table, char* key, void* value){
 size_t get_count(ht* table){
     return table->count;
 }
+
+void ht_foreach(ht* table, void (*fn)(void*)){
+    for(size_t i = 0; i < table->size; i++){
+          for(item* entry = table->items[i].next; entry != NULL; entry = entry->next){
+              fn(entry->value);
+          }
+      }
+  }
