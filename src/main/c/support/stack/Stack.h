@@ -22,6 +22,8 @@ bool push(stack* stk, void* element);
 
 void* pop(stack* stk);
 
+void* peek(stack* stk);
+
 bool is_empty(stack* stk);
 
 #endif

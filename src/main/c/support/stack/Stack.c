@@ -12,7 +12,7 @@ void free_stack(stack* stk){
     if(stk == NULL) {
         return;
     }
-    
+
     stk_item* item = stk->stk;
     
     while(item != NULL){
@@ -46,6 +46,13 @@ void* pop(stack* stk){
     free(top);
     stk->size--;
     return element;
+}
+
+void* peek(stack* stk){
+    if(!is_empty(stk)){
+        return stk->stk->element;
+    }
+    return NULL;
 }
 
 bool is_empty(stack* stk){

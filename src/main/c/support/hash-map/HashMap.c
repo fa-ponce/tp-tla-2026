@@ -48,15 +48,8 @@ static item* create_item(char* key, void* value){
         return NULL;
     }
 
-    it->value = malloc(strlen(value) + 1);
-    if(it->value == NULL){
-        free(it->key);
-        free(it);
-        return NULL;
-    }
-
     strcpy(it->key, key);
-    strcpy(it->value, value);
+    it->value = value;
     return it;
 }
 
@@ -84,7 +77,6 @@ for(size_t i = 0; i < table->size; i++){
         while(entry != NULL){
             item* next = entry->next;
             free(entry->key);
-            free(entry->value);   // depende de la decision de la seccion 3
             free(entry);
             entry = next;
         }
@@ -118,13 +110,7 @@ bool set_value(ht* table, char* key, void* value){
     while(it->next != NULL){
         // Nos fijamos si ya existe la key
         if(strcmp(it->next->key, key) == 0){
-            char* new_value = malloc(strlen(value) + 1);
-            if(new_value == NULL){
-                return false;
-            }
-            strcpy(new_value, value);
-            free(it->next->value);
-            it->next->value = new_value;
+            it->next->value = value;
             return true;
         }
         it = it->next;
