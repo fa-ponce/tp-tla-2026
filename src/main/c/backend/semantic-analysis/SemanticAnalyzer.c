@@ -245,7 +245,7 @@ static void _visitFilterStage(FilterStage *filterStage){
 }
 
 static void _visitMutateStage(MutateStage *mutateStage){
-
+_visitMutateExpression(mutateStage->expression);
 }
 
 static void _visitSelectStage(SelectStage *selectStage){
@@ -269,7 +269,7 @@ static void _visitApplyStage(ApplyStage *applyStage){
 }
 
 static void _visitSortStage(SortStage *sortStage){
-
+    // No hace nada, solo tiene una columna y una direccion
 }
 
 static void _visitProgram(Program *program){
@@ -317,15 +317,31 @@ static void _visitMutateExpression(MutateExpression *mutateExpression){
 }
 
 static void _visitScriptDeclaration(ScriptDeclaration *scriptDeclaration){
-    
+    _visitExpression(scriptDeclaration->loadPath);
+    _visitScriptBody(scriptDeclaration->body);
 }
 
-static void _visitScriptBody(ScriptBody *scriptBody)
-{
+static void _visitScriptBody(ScriptBody *scriptBody){
+    for(ScriptBody* list = scriptBody; list != NULL; list = list->next){
+        switch(list->type){
+            case STAGE_SCRIPT_BODY:
+                _visitStage(list->stage);
+                break;
+            case BLOCK_SCRIPT_BODY:
+                _visitBlock(list->block);
+                break;
+            case SAVE_SCRIPT_BODY:
+                _visitExpression(list->savePath);
+                break;
+            default:
+                break;
+        }
+    }
 }
 
-static void _visitBlock(Block *block)
-{
+static void _visitBlock(Block *block){
+    _visitStageList(block->stages);
+    _visitExpression(block->savePath);
 }
 
 static void _visitForStatement(ForStatement *forStatement){

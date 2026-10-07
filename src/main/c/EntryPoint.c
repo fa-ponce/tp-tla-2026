@@ -8,6 +8,7 @@
 #include "support/type/CompilationStatus.h"
 #include "support/type/CompilerState.h"
 #include "support/type/ModuleDestructor.h"
+#include "backend/semantic-analysis/SemanticAnalyzer.h"
 
 /**
  * The main entry-point of the entire application. If you use "strtok" to
@@ -28,7 +29,8 @@ const int main(const int length, const char ** arguments) {
 		initializeAbstractSyntaxTreeModule(),
 		initializeFlexActionsModule(lexicalAnalyzer),
 		initializeBisonActionsModule(&compilerState),
-		initializeFrontendModule(lexicalAnalyzer)
+		initializeFrontendModule(lexicalAnalyzer),
+		initializeSemanticAnalyzerModule(),
 		// initializeCalculatorModule(),
 		// initializeGeneratorModule()
 	};
@@ -38,6 +40,17 @@ const int main(const int length, const char ** arguments) {
 		// ----------------------------------------------------------------------------------------
 		// Beginning of the Backend... ------------------------------------------------------------
 		logInformation(logger, "The syntactic-analysis phase accepts the input program.");
+		
+		/*
+			Aca realizamos el llenado de la tabla de simbolos,
+			y vemos si es correcto semanticamente el programa
+		*/  
+		compilationStatus = executeSemanticAnalysis(program);
+		if (compilationStatus != SUCCEEDED) {
+      		logError(logger, "The semantic-analysis phase rejects the input program.");
+  		}
+
+		
 		/*
 		logDebugging(logger, "Computing expression value...");
 		ComputationResult computationResult = executeCalculator(&compilerState);

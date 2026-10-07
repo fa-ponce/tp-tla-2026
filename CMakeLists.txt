@@ -48,6 +48,10 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
 		src/main/c/support/logging/Logger.c
 		# Add more *.c files if needed (otherwise, they won't be compiled).
 		# ...
+		src/main/c/support/hash-map/HashMap.c
+		src/main/c/support/stack/Stack.c
+		src/main/c/backend/semantic-analysis/SemanticAnalyzer.c
+		src/main/c/backend/semantic-analysis/SymbolTable.c
 	)
 
 	# Link final project and libraries.
