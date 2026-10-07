@@ -52,6 +52,7 @@ CompilationStatus BooleanLexemeAction(bool value);
 CompilationStatus StringLexemeAction();
 CompilationStatus NumberLexemeAction();
 CompilationStatus IdentLexemeAction();
+CompilationStatus ColumnLexemeAction();
 CompilationStatus ExternalParamLexemeAction();
 CompilationStatus IgnoredLexemeAction();
 CompilationStatus UnknownLexemeAction();

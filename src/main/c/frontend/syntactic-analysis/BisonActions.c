@@ -459,3 +459,11 @@ Expression * FunctionCallExpressionSemanticAction(char * functionName, Expressio
 	expression->type = FUNCTION_CALL;
 	return expression;
 }
+
+Expression * ColumnExpressionSemanticAction(char* column){
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	Expression* expression = calloc(1, sizeof(Expression));
+	expression->column = column;
+	expression->type = COLUMN_REFERENCE;
+	return expression;
+}

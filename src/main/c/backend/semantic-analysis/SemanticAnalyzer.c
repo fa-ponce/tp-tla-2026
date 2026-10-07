@@ -232,6 +232,9 @@ static void _visitExpression(Expression* expression){
         _visitExpressionList(expression->arguments);
         break;
     }
+    case COLUMN_REFERENCE:
+        break;
+
     default:
         break;
     }

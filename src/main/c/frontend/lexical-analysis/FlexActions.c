@@ -380,6 +380,15 @@ CompilationStatus NumberLexemeAction(){
 	return status;
 }
 
+CompilationStatus ColumnLexemeAction(){
+	Token* token = createToken(_lexicalAnalyzer, COLUMN);
+	token->semanticValue->string = strdup(token->lexeme + 1); // Le saco el '@' del principio
+	_logTokenAction(__FUNCTION__, token);
+	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
+	destroyToken(token);
+	return status;
+}
+
 CompilationStatus IdentLexemeAction(){
 	Token * token = createToken(_lexicalAnalyzer, IDENT);
 	token->semanticValue->string = strdup(token->lexeme);

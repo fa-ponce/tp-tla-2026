@@ -55,6 +55,7 @@ extern CompilationStatus ExternalParamLexemeAction();
 extern CompilationStatus IgnoredLexemeAction();
 extern CompilationStatus UnknownLexemeAction();
 extern CompilationStatus EOFLexemeAction();
+extern CompilationStatus ColumnLexemeAction();
 
 %}
 
@@ -156,6 +157,7 @@ NUMBER              {digit}+(\.{digit}+)?
 {NUMBER}        { return NumberLexemeAction(); }
 {IDENT}         { return IdentLexemeAction();  }
 "$"{IDENT}      { return ExternalParamLexemeAction(); }
+"@"{IDENT}      { return ColumnLexemeAction(); }
 {WHITESPACE}    { return IgnoredLexemeAction(); }
 
 .               { return UnknownLexemeAction(); }

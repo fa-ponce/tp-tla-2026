@@ -146,6 +146,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <string> STRING
 %token <string> IDENT
 %token <string> EXTERNAL_PARAM
+%token <string> COLUMN
 
 %token <token> IGNORED
 %token <token> UNKNOWN
@@ -355,6 +356,7 @@ primary: NUMBER															{ $$ = NumberExpressionSemanticAction($1); }
 	| BOOLEAN															{ $$ = BooleanExpressionSemanticAction($1); }
 	| IDENT																{ $$ = IdentifierExpressionSemanticAction($1); }
 	| EXTERNAL_PARAM													{ $$ = ExternalParameterExpressionSemanticAction($1); }
+	| COLUMN															{ $$ = ColumnExpressionSemanticAction($1); }
 	| IDENT OPEN_PARENTHESIS argList CLOSE_PARENTHESIS					{ $$ = FunctionCallExpressionSemanticAction($1, $3); }
 	| IDENT OPEN_PARENTHESIS CLOSE_PARENTHESIS							{ $$ = FunctionCallExpressionSemanticAction($1, NULL); }
 	| OPEN_PARENTHESIS expr CLOSE_PARENTHESIS							{ $$ = $2; }

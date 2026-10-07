@@ -85,5 +85,6 @@ Expression * BooleanExpressionSemanticAction(const bool value);
 Expression * IdentifierExpressionSemanticAction(char * identifier);
 Expression * ExternalParameterExpressionSemanticAction(char * name);
 Expression * FunctionCallExpressionSemanticAction(char * functionName, ExpressionList * arguments);
+Expression * ColumnExpressionSemanticAction(char* column);
 
 #endif

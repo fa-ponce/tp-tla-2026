@@ -324,6 +324,9 @@ void destroyExpression(Expression * expression) {
 				free(expression->functionName);
 				destroyExpressionList(expression->arguments);
 				break;
+			case COLUMN_REFERENCE:
+				free(expression->column);
+				break;
 		}
 		free(expression);
 	}

@@ -104,6 +104,7 @@ enum ExpressionType {
 	BOOLEAN_LITERAL,
 	IDENTIFIER,
 	EXTERNAL_PARAMETER,
+	COLUMN_REFERENCE,
 	FUNCTION_CALL
 };
 
@@ -286,6 +287,7 @@ struct Expression {
 		bool boolean;
 		char * identifier;
 		char * externalParameter;
+		char * column;
 		struct {
 			char * functionName;
 			ExpressionList * arguments;
