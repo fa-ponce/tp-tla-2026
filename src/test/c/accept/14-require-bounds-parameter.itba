@@ -1,5 +1,5 @@
 pipeline aplicar_tasa(tasa) require tasa >= 0 AND tasa <= 1 {
-    MUTATE final = precio * (1 + tasa)
+    MUTATE final = @precio * (1 + tasa)
 }
 
 LOAD "productos.csv"

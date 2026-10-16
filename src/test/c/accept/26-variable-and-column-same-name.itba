@@ -1,0 +1,5 @@
+let precio = 2;
+
+LOAD "in.csv"
+MUTATE total = @precio * precio
+SAVE "out.csv"

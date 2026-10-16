@@ -1,10 +1,10 @@
 LOAD "ventas.csv"
-FILTER region = "AMBA"
+FILTER @region = "AMBA"
 {
-    FILTER total > 10000
+    FILTER @total > 10000
     SAVE "premium.csv"
 }
 {
-    FILTER total <= 10000
+    FILTER @total <= 10000
     SAVE "resto.csv"
 }

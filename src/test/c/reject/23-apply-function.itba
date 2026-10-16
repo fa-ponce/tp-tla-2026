@@ -1,0 +1,5 @@
+function recargo(x) { return x * 0.05; }
+
+LOAD "in.csv"
+APPLY recargo(1)
+SAVE "out.csv"

@@ -1,0 +1,5 @@
+LOAD "ventas.csv"
+{
+    FILTER @total > minimo
+    SAVE "premium.csv"
+}

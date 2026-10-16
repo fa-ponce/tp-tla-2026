@@ -1,5 +1,5 @@
-// PENDIENTE: hoy el compilador lo acepta (status 0) porque todavía no está
-// implementado el análisis semántico del backend. Es sintácticamente válido.
+// PENDIENTE: hoy el compilador lo acepta (status 0) porque el análisis
+// semántico todavía no prohíbe columnas fuera de los stages.
 
 LOAD "in.csv"
-SAVE nombre + ".csv"
+SAVE @nombre + ".csv"

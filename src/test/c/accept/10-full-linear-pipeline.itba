@@ -1,6 +1,6 @@
 LOAD "in.csv"
-FILTER stock > 0
-MUTATE total = precio * 1.21
+FILTER @stock > 0
+MUTATE total = @precio * 1.21
 SELECT id, total
 SORT BY total DESC
 LIMIT 10

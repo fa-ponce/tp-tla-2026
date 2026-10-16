@@ -1,2 +1,2 @@
 LOAD "in.csv"
-FILTER edad > 18
+FILTER @edad > 18

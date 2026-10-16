@@ -1,2 +1,2 @@
-FILTER edad > 18
+FILTER @edad > 18
 SAVE "out.csv"

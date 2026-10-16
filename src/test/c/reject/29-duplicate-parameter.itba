@@ -1,0 +1,4 @@
+function suma(x, x) { return x + x; }
+
+LOAD "in.csv"
+SAVE "out.csv"

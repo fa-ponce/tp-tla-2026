@@ -1,0 +1,7 @@
+pipeline limpiar() {
+    FILTER @precio > 0
+}
+
+LOAD "in.csv"
+APPLY limpiar(10)
+SAVE "out.csv"

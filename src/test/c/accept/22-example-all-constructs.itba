@@ -5,9 +5,9 @@ function recargo(precio) {
 }
 
 pipeline aplicar_impuesto(tasa) require tasa >= 0 AND tasa <= 1 {
-    MUTATE precio_final = IF precio > 1000
-                          THEN precio * (1 + tasa) + recargo(precio)
-                          ELSE precio * (1 + tasa)
+    MUTATE precio_final = IF @precio > 1000
+                          THEN @precio * (1 + tasa) + recargo(@precio)
+                          ELSE @precio * (1 + tasa)
     SELECT nombre, precio_final
 }
 

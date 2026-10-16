@@ -1,0 +1,4 @@
+for tasa in [[0.10, "a.csv"], [0.27, "b.csv"]] {
+    LOAD "in.csv"
+    SAVE "out.csv"
+}

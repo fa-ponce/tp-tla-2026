@@ -1,0 +1,16 @@
+let minimo = 10000;
+
+pipeline marcar(valor) {
+    MUTATE marca = valor
+}
+
+LOAD "ventas.csv"
+{
+    FILTER @total > minimo
+    APPLY marcar(1)
+    SAVE "premium_" + minimo + ".csv"
+}
+{
+    FILTER @total <= minimo
+    SAVE "resto.csv"
+}

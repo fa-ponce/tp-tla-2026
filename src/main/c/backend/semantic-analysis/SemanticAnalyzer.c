@@ -21,13 +21,16 @@ static void _visitSortStage(SortStage* sortStage);
 static void _visitProgram(Program* program);
 static void _visitIdentifierList(IdentifierList* identifierList);
 static void _visitExpressionList(ExpressionList* expressionList);
-static void _visitTupleList(TupleList* tupleList);
+static void _visitTupleList(TupleList* tupleList, int expectedSize);
 static void _visitMutateExpression(MutateExpression* mutateExpression);
 static void _visitScriptDeclaration(ScriptDeclaration* scriptDeclaration);
 static void _visitScriptBody(ScriptBody* scriptBody);
 static void _visitBlock(Block* block);
 static void _visitForStatement(ForStatement* forStatement);
-
+static void _collectDeclarations(DeclarationList* declarationList);
+static int _countIdentifiers(IdentifierList* list);
+static int _countExpressions(ExpressionList* list);
+static void _checkArity(char* name, IdentifierList* parameters, ExpressionList* arguments);
 
 
 static Logger* _logger = NULL;
@@ -45,6 +48,44 @@ static void _shutdownSemanticAnalyzerModule() {
 ModuleDestructor initializeSemanticAnalyzerModule() {
     _logger = createLogger("SemanticAnalyzer");
     return _shutdownSemanticAnalyzerModule;
+}
+
+static void _collectDeclarations(DeclarationList* declarationList){
+      for(DeclarationList* node = declarationList; node != NULL; node = node->next){
+          Declaration* declaration = node->declaration;
+          switch(declaration->type){
+              case FUNCTION_DECLARATION:
+                  _declare(declaration->functionDeclaration->name, (Symbol){ .kind = FUNCTION_SYMBOL, .function = declaration->functionDeclaration });
+                  break;
+              case PIPELINE_DECLARATION:
+                  _declare(declaration->pipelineDeclaration->name, (Symbol){ .kind = PIPELINE_SYMBOL, .pipeline = declaration->pipelineDeclaration });
+                  break;
+              default:
+                  break;
+          }
+      }
+}
+
+
+static int _countIdentifiers(IdentifierList* list){
+      int count = 0;
+      for(; list != NULL; list = list->next) count++;
+      return count;
+}
+
+static int _countExpressions(ExpressionList* list){
+      int count = 0;
+      for(; list != NULL; list = list->next) count++;
+      return count;
+}
+
+static void _checkArity(char* name, IdentifierList* parameters, ExpressionList* arguments){
+      int expected = _countIdentifiers(parameters);
+      int received = _countExpressions(arguments);
+      if(expected != received){
+          logError(_logger, "'%s' espera %d argumentos, recibio %d", name, expected, received);
+          _failed = true;
+      }
 }
 
 static void _visitDeclarationList(DeclarationList* declarationList){
@@ -76,8 +117,7 @@ static void _visitLetDeclaration(LetDeclaration* letDeclaration){
 
 
 static void _visitFunctionDeclaration(FunctionDeclaration* functionDeclaration){
-    _declare(functionDeclaration->name, (Symbol){ .kind = FUNCTION_SYMBOL, .function = functionDeclaration});
-
+    
     // Entramos a un nuevo scope para leer los parametros
     if(!enterScope()){
         logError(_logger, "No hay memoria para el scope de %s", functionDeclaration->name);
@@ -94,7 +134,6 @@ static void _visitFunctionDeclaration(FunctionDeclaration* functionDeclaration){
 }
 
 static void _visitPipelineDeclaration(PipelineDeclaration* pipelineDeclaration){
-    _declare(pipelineDeclaration->name, (Symbol){ .kind = PIPELINE_SYMBOL, .pipeline = pipelineDeclaration});
 
     // Entramos a un nuevo scope para leer los parametros
     if(!enterScope()){
@@ -228,6 +267,8 @@ static void _visitExpression(Expression* expression){
         } else if (symbol->kind != FUNCTION_SYMBOL){
             logError(_logger, "'%s' no es una funcion", expression->functionName);
             _failed = true;
+        } else {
+            _checkArity(expression->functionName, symbol->function->parameters, expression->arguments);
         }
         _visitExpressionList(expression->arguments);
         break;
@@ -264,6 +305,8 @@ static void _visitApplyStage(ApplyStage *applyStage){
     } else if (symbol->kind != PIPELINE_SYMBOL){
         logError(_logger, "'%s' no es un pipeline", applyStage->pipelineName);
         _failed = true;
+    } else {
+        _checkArity(applyStage->pipelineName, symbol->pipeline->parameters, applyStage->arguments);
     }
     _visitExpressionList(applyStage->arguments);
 }
@@ -295,8 +338,14 @@ static void _visitExpressionList(ExpressionList *expressionList){
     }
 }
 
-static void _visitTupleList(TupleList *tupleList){
-    for(TupleList* list = tupleList; list != NULL; list = list->next){
+static void _visitTupleList(TupleList *tupleList, int expectedSize){
+    int position = 1;
+    for(TupleList* list = tupleList; list != NULL; list = list->next, position++){
+        int size = _countExpressions(list->tuple);
+        if(size != expectedSize){
+            logError(_logger, "La tupla %d del for tiene %d valores, se esperaban %d", position, size, expectedSize);
+            _failed = true;
+        }
         _visitExpressionList(list->tuple);
     }
 }
@@ -350,8 +399,9 @@ static void _visitForStatement(ForStatement *forStatement){
         _failed = true;
         return;
     }
+    // Los valores se resuelven antes de declarar las variables del for
+    _visitTupleList(forStatement->values, _countIdentifiers(forStatement->identifiers));
     _declareIdentifierList(forStatement->identifiers, FOR_VARIABLE_SYMBOL);
-    _visitTupleList(forStatement->values);
     _visitScriptDeclaration(forStatement->body);
     exitScope();
 }
@@ -360,6 +410,7 @@ CompilationStatus executeSemanticAnalysis(Program* program) {
     if (!initScopes() || !enterScope()) {
         return OUT_OF_MEMORY;
     }
+    _collectDeclarations(program->declarations);
     _visitProgram(program);
     destroyScopes();
     return _failed ? FAILED : SUCCEEDED;

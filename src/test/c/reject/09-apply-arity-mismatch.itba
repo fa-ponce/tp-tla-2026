@@ -1,8 +1,5 @@
-// PENDIENTE: hoy el compilador lo acepta (status 0) porque todavía no está
-// implementado el análisis semántico del backend. Es sintácticamente válido.
-
 pipeline aplicar_tasa(tasa) {
-    MUTATE final = precio * (1 + tasa)
+    MUTATE final = @precio * (1 + tasa)
 }
 
 LOAD "in.csv"

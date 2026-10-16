@@ -1,0 +1,5 @@
+for ruta in ["a.csv", "b.csv"] {
+    LOAD ruta
+    FILTER @total > 0
+    SAVE "procesado_" + ruta
+}

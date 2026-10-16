@@ -1,0 +1,4 @@
+for (tasa, ruta) in [0.10, 0.27] {
+    LOAD "in.csv"
+    SAVE ruta
+}

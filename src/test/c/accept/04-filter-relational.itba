@@ -1,3 +1,3 @@
 LOAD "in.csv"
-FILTER precio < 100
+FILTER @precio < 100
 SAVE "out.csv"

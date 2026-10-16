@@ -1,6 +1,3 @@
-// PENDIENTE: hoy el compilador lo acepta (status 0) porque todavía no está
-// implementado el análisis semántico del backend. Es sintácticamente válido.
-
 for (tasa, ruta) in [[0.10, "a.csv"], [0.27]] {
     LOAD "in.csv"
     SAVE ruta

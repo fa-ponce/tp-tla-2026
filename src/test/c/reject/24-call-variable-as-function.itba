@@ -1,0 +1,5 @@
+let tasa = 0.21;
+
+LOAD "in.csv"
+MUTATE final = @precio * tasa(2)
+SAVE "out.csv"

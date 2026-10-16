@@ -1,0 +1,5 @@
+let tasa = base + 0.05;
+let base = 0.21;
+
+LOAD "in.csv"
+SAVE "out.csv"

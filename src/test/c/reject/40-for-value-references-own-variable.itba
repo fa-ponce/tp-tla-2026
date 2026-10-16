@@ -1,0 +1,4 @@
+for tasa in [tasa, 0.21] {
+    LOAD "in.csv"
+    SAVE "out.csv"
+}

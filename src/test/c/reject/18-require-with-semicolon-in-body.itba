@@ -1,5 +1,5 @@
 pipeline aplicar_tasa(tasa) {
-    MUTATE final = precio * (1 + tasa)
+    MUTATE final = @precio * (1 + tasa)
     require tasa >= 0;
 }
 

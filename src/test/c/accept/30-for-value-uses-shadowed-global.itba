@@ -1,0 +1,7 @@
+let tasa = 0.10;
+
+for tasa in [tasa, 0.21] {
+    LOAD "in.csv"
+    MUTATE final = @precio * (1 + tasa)
+    SAVE "out.csv"
+}
