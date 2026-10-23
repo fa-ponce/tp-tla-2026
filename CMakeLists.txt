@@ -33,9 +33,7 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
 	# Defines the entry-point of the application, and the source-codes (*.c extension).
 	# The header files (*.h extension), are automatically included from the source-codes.
 	add_executable(Flex-Bison-Compiler
-		# Backend disabled until it's rewritten for the TabularDSL AST.
-		# src/main/c/backend/code-generation/Generator.c
-		# src/main/c/backend/domain-specific/Calculator.c
+		src/main/c/backend/code-generation/Generator.c
 		src/main/c/EntryPoint.c
 		src/main/c/frontend/Frontend.c
 		src/main/c/frontend/lexical-analysis/FlexActions.c
@@ -52,6 +50,7 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
 		src/main/c/support/stack/Stack.c
 		src/main/c/backend/semantic-analysis/SemanticAnalyzer.c
 		src/main/c/backend/semantic-analysis/SymbolTable.c
+		src/main/c/backend/semantic-analysis/TypeChecker.c
 	)
 
 	# Link final project and libraries.

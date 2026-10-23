@@ -18,6 +18,11 @@ typedef struct {
 	 */
 	signed int value;
 
+	/**
+	 * Path of the generated Python file.
+	 */
+	const char * outputPath;
+
 	// TODO: Add a symbol table.
 	// TODO: Add an stack to handle nested scopes.
 	// TODO: Add more configuration.

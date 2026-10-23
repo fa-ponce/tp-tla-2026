@@ -1,6 +1,4 @@
-// Backend disabled until it's rewritten for the TabularDSL AST.
-// #include "backend/code-generation/Generator.h"
-// #include "backend/domain-specific/Calculator.h"
+#include "backend/code-generation/Generator.h"
 #include "frontend/Frontend.h"
 #include "frontend/lexical-analysis/FlexActions.h"
 #include "frontend/syntactic-analysis/BisonActions.h"
@@ -9,6 +7,7 @@
 #include "support/type/CompilerState.h"
 #include "support/type/ModuleDestructor.h"
 #include "backend/semantic-analysis/SemanticAnalyzer.h"
+#include "backend/semantic-analysis/TypeChecker.h"
 
 /**
  * The main entry-point of the entire application. If you use "strtok" to
@@ -23,7 +22,9 @@ const int main(const int length, const char ** arguments) {
 	}
 	CompilerState compilerState = {
 		.abstractSyntaxtTree = NULL,
-		.value = 0
+		.value = 0,
+		// El primer argumento es la ruta del .py generado
+		.outputPath = 1 < length ? arguments[1] : "output.py"
 	};
 	ModuleDestructor moduleDestructors[] = {
 		initializeAbstractSyntaxTreeModule(),
@@ -31,8 +32,8 @@ const int main(const int length, const char ** arguments) {
 		initializeBisonActionsModule(&compilerState),
 		initializeFrontendModule(lexicalAnalyzer),
 		initializeSemanticAnalyzerModule(),
-		// initializeCalculatorModule(),
-		// initializeGeneratorModule()
+		initializeTypeCheckerModule(),
+		initializeGeneratorModule()
 	};
 	CompilationStatus compilationStatus = executeSyntacticAnalysis();
 	Program * program = compilerState.abstractSyntaxtTree;
@@ -49,20 +50,9 @@ const int main(const int length, const char ** arguments) {
 		if (compilationStatus != SUCCEEDED) {
       		logError(logger, "The semantic-analysis phase rejects the input program.");
   		}
-
-		
-		/*
-		logDebugging(logger, "Computing expression value...");
-		ComputationResult computationResult = executeCalculator(&compilerState);
-		if (computationResult.succeeded) {
-			compilerState.value = computationResult.value;
-			executeGenerator(&compilerState);
-		}
 		else {
-			logError(logger, "The computation phase rejects the input program.");
-			compilationStatus = FAILED;
+			compilationStatus = executeGenerator(&compilerState);
 		}
-		*/
 		// ...end of the Backend. -----------------------------------------------------------------
 		// ----------------------------------------------------------------------------------------
 	}

@@ -17,9 +17,17 @@ typedef enum {
     BOOLEAN_TYPE
 } ValueType;
 
+typedef enum {
+    INFERENCE_PENDING,
+    INFERENCE_IN_PROGRESS,
+    INFERENCE_DONE
+} InferenceState;
+
 typedef struct Symbol {
+    int id;                  // unico por simbolo, lo usa el generador para que no choquen nombres con shadowing
     SymbolKind kind;
-    ValueType type;
+    ValueType type;          // en FUNCTION es el tipo de retorno
+    InferenceState state;    // FUNCTION: inferencia del retorno. PIPELINE: deteccion de APPLY recursivo
     union {
         LetDeclaration* let;
         FunctionDeclaration* function;

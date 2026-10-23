@@ -4,6 +4,7 @@
 
 static stack* scopeStack = NULL;
 static stack* allSymbols = NULL;
+static int nextSymbolId = 0;
 
 // Habria q inicializarlo en el entryPoint, antes de arrancar
 // A llenar la tabla de simbolos
@@ -69,6 +70,7 @@ Symbol* addSymbol(char* name, Symbol symbol){
         return NULL;
     }
     *newSymbol = symbol;
+    newSymbol->id = nextSymbolId++;
     if(!push(allSymbols, newSymbol)){
         free(newSymbol);
         return NULL;

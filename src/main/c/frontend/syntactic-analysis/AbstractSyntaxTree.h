@@ -131,17 +131,20 @@ struct Declaration {
 
 struct LetDeclaration {
 	char * name;
+	struct Symbol * symbol;
 	Expression * value;
 };
 
 struct FunctionDeclaration {
 	char * name;
+	struct Symbol * symbol;
 	IdentifierList * parameters;
 	Expression * returnExpression;
 };
 
 struct PipelineDeclaration {
 	char * name;
+	struct Symbol * symbol;
 	IdentifierList * parameters;
 	Condition * requirement;
 	StageList * stages;

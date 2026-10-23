@@ -1,5 +1,6 @@
 #include "SemanticAnalyzer.h"
 #include "SymbolTable.h"
+#include "TypeChecker.h"
 
 static void _visitDeclarationList(DeclarationList* declarationList);
 static void _visitDeclaration(Declaration* declaration);
@@ -57,10 +58,10 @@ static void _collectDeclarations(DeclarationList* declarationList){
           Declaration* declaration = node->declaration;
           switch(declaration->type){
               case FUNCTION_DECLARATION:
-                  _declare(declaration->functionDeclaration->name, (Symbol){ .kind = FUNCTION_SYMBOL, .function = declaration->functionDeclaration });
+                  declaration->functionDeclaration->symbol = _declare(declaration->functionDeclaration->name, (Symbol){ .kind = FUNCTION_SYMBOL, .function = declaration->functionDeclaration });
                   break;
               case PIPELINE_DECLARATION:
-                  _declare(declaration->pipelineDeclaration->name, (Symbol){ .kind = PIPELINE_SYMBOL, .pipeline = declaration->pipelineDeclaration });
+                  declaration->pipelineDeclaration->symbol = _declare(declaration->pipelineDeclaration->name, (Symbol){ .kind = PIPELINE_SYMBOL, .pipeline = declaration->pipelineDeclaration });
                   break;
               default:
                   break;
@@ -127,7 +128,7 @@ static void _visitDeclaration(Declaration* declaration){
 
 static void _visitLetDeclaration(LetDeclaration* letDeclaration){
     _visitExpression(letDeclaration->value);
-    _declare(letDeclaration->name, (Symbol){ .kind = LET_SYMBOL, .let = letDeclaration });
+    letDeclaration->symbol = _declare(letDeclaration->name, (Symbol){ .kind = LET_SYMBOL, .let = letDeclaration });
 }
 
 
@@ -410,6 +411,10 @@ CompilationStatus executeSemanticAnalysis(Program* program) {
     _collectDeclarations(program->declarations);
 
     _visitProgram(program);
+    // Los tipos se chequean solo si todos los nombres se resolvieron
+    if(!_failed && !executeTypeCheck(program)){
+        _failed = true;
+    }
     destroyScopes();
     return _failed ? FAILED : SUCCEEDED;
 }
