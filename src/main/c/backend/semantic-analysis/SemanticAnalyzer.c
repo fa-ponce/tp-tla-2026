@@ -37,6 +37,15 @@ static void _checkArity(char* name, IdentifierList* parameters, ExpressionList* 
 static Logger* _logger = NULL;
 static bool _failed = false;   // para seguir recorriendo y reportar todos los errores, no solo el primero
 
+// Donde esta la expresion que se visita: define si se puede usar una columna o llamar a una funcion
+typedef enum {
+    GLOBAL_CONTEXT,     // let, function, LOAD, SAVE, LIMIT, argumentos de APPLY, valores del for
+    ROW_CONTEXT,        // FILTER y MUTATE: se evaluan fila por fila, hay una fila actual
+    REQUIRE_CONTEXT     // require de un pipeline
+} ExpressionContext;
+
+static ExpressionContext _context = GLOBAL_CONTEXT;
+
 
 
 static void _shutdownSemanticAnalyzerModule() {
@@ -160,7 +169,9 @@ static void _visitPipelineDeclaration(PipelineDeclaration* pipelineDeclaration){
     // Visito los parametros
     _declareIdentifierList(pipelineDeclaration->parameters, PARAMETER_SYMBOL);
     // visito los requerimientos
+    _context = REQUIRE_CONTEXT;
     _visitCondition(pipelineDeclaration->requirement);
+    _context = GLOBAL_CONTEXT;
     // visito las stages
     _visitStageList(pipelineDeclaration->stages);
 
@@ -254,6 +265,10 @@ static void _visitExpression(Expression* expression){
     case EXTERNAL_PARAMETER:
         break;
     case FUNCTION_CALL:{
+        if(_context == REQUIRE_CONTEXT){
+            logError(_logger, "No se puede llamar a la funcion '%s' dentro de un require", expression->functionName);
+            _failed = true;
+        }
         Symbol* symbol = lookupSymbol(expression->functionName);
         if(symbol == NULL){
             logError(_logger, "La funcion '%s' no fue declarada previamente", expression->functionName);
@@ -269,6 +284,10 @@ static void _visitExpression(Expression* expression){
         break;
     }
     case COLUMN_REFERENCE:
+        if(_context != ROW_CONTEXT){
+            logError(_logger, "La columna '@%s' solo se puede usar dentro de FILTER o MUTATE", expression->column);
+            _failed = true;
+        }
         break;
 
     default:
@@ -277,11 +296,15 @@ static void _visitExpression(Expression* expression){
 }
 
 static void _visitFilterStage(FilterStage *filterStage){
+    _context = ROW_CONTEXT;
     _visitCondition(filterStage->condition);
+    _context = GLOBAL_CONTEXT;
 }
 
 static void _visitMutateStage(MutateStage *mutateStage){
-_visitMutateExpression(mutateStage->expression);
+    _context = ROW_CONTEXT;
+    _visitMutateExpression(mutateStage->expression);
+    _context = GLOBAL_CONTEXT;
 }
 
 static void _visitSelectStage(SelectStage *selectStage){
