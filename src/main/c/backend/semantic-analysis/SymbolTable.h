@@ -10,8 +10,16 @@ typedef enum {
     FOR_VARIABLE_SYMBOL
 } SymbolKind;
 
-  typedef struct {
+typedef enum {
+    UNKNOWN_TYPE,
+    NUMBER_TYPE,
+    STRING_TYPE,
+    BOOLEAN_TYPE
+} ValueType;
+
+typedef struct Symbol {
     SymbolKind kind;
+    ValueType type;
     union {
         LetDeclaration* let;
         FunctionDeclaration* function;
@@ -34,8 +42,9 @@ int findSymbol(char* name);
 // Devuelve el simbolo
 Symbol* lookupSymbol(char* name);
 
-// Aniade un simbolo al scope actual
-bool addSymbol(char* name, Symbol* symbol);
+// Aniade un simbolo al scope actual y devuelve el puntero (NULL si falla)
+// La tabla es duenia del simbolo: sobrevive a exitScope y se libera en destroySymbols
+Symbol* addSymbol(char* name, Symbol symbol);
 
 // Chequea si el simbolo existe en el scope actual
 bool checkSymbol(char* name);
@@ -44,5 +53,8 @@ bool checkSymbol(char* name);
 void exitScope(void);
 
 void destroyScopes(void);
+
+// Libera todos los simbolos creados, llamar cuando nadie mas los use
+void destroySymbols(void);
 
 #endif

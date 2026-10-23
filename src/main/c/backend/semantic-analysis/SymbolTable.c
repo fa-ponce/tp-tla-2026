@@ -3,12 +3,14 @@
 #include "../../support/stack/Stack.h"
 
 static stack* scopeStack = NULL;
+static stack* allSymbols = NULL;
 
 // Habria q inicializarlo en el entryPoint, antes de arrancar
 // A llenar la tabla de simbolos
 bool initScopes(void){
     scopeStack = create_stack();
-    return scopeStack != NULL;
+    allSymbols = create_stack();
+    return scopeStack != NULL && allSymbols != NULL;
 }
 
 bool enterScope(void){
@@ -57,18 +59,22 @@ Symbol* lookupSymbol(char* name){
 }
 
 
-bool addSymbol(char* name, Symbol* symbol){
+Symbol* addSymbol(char* name, Symbol symbol){
     ht* scopeTable = peek(scopeStack);
-    if(scopeTable == NULL){ // No hay ningun scope abierto
-        return false;
+    if(scopeTable == NULL || checkSymbol(name)){
+        return NULL;
     }
-    // Nos fijamos si el simbolo ya esta declarado en el scope
-    if(checkSymbol(name)){
-        return false;
+    Symbol* newSymbol = malloc(sizeof(Symbol));
+    if(newSymbol == NULL){
+        return NULL;
     }
-
-    // Como no esta en el scope, lo podemos agregar tranquilos
-    return set_value(scopeTable, name, symbol);
+    *newSymbol = symbol;
+    if(!push(allSymbols, newSymbol)){
+        free(newSymbol);
+        return NULL;
+    }
+    // Si falla el set, el simbolo ya esta en allSymbols y se libera al final
+    return set_value(scopeTable, name, newSymbol) ? newSymbol : NULL;
 }
 
 bool checkSymbol(char* name){
@@ -83,10 +89,8 @@ bool checkSymbol(char* name){
 void exitScope(void){
     ht* scopeTable = pop(scopeStack);
     if(scopeTable != NULL){
-        ht_foreach(scopeTable, free);
         destroy_ht(scopeTable);
     }
-
 }
 
 void destroyScopes(void){
@@ -99,3 +103,15 @@ void destroyScopes(void){
       free_stack(scopeStack);
       scopeStack = NULL;
   }
+
+
+void destroySymbols(void){
+    if(allSymbols == NULL){
+        return;
+    }
+    while(!is_empty(allSymbols)){
+        free(pop(allSymbols));
+    }
+    free_stack(allSymbols);
+    allSymbols = NULL;
+}

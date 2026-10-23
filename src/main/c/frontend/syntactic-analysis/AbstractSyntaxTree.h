@@ -48,6 +48,7 @@ typedef struct ForStatement ForStatement;
 typedef struct TupleList TupleList;
 typedef struct Condition Condition;
 typedef struct Expression Expression;
+struct Symbol;
 
 /**
  * Node types for the Abstract Syntax Tree (AST).
@@ -155,6 +156,7 @@ struct DeclarationList {
 
 struct IdentifierList {
 	char * identifier;
+	struct Symbol * symbol;
 	IdentifierList * next;
 };
 
@@ -223,6 +225,7 @@ struct LimitStage {
 
 struct ApplyStage {
 	char * pipelineName;
+	struct Symbol * symbol;
 	ExpressionList * arguments;
 };
 
@@ -293,6 +296,7 @@ struct Expression {
 			ExpressionList * arguments;
 		};
 	};
+	struct Symbol * symbol;
 	ExpressionType type;
 };
 

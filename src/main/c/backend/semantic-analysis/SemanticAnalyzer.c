@@ -10,7 +10,7 @@ static void _visitCondition(Condition* condition);
 static void _visitStageList(StageList* stageList);
 static void _visitStage(Stage* stage);
 static void _declareIdentifierList(IdentifierList* identifierList, SymbolKind kind);
-static void _declare(char* name, Symbol symbol);
+static Symbol* _declare(char* name, Symbol symbol);
 static void _visitExpression(Expression* expression);
 static void _visitFilterStage(FilterStage* filterStage);
 static void _visitMutateStage(MutateStage* mutateStage);
@@ -39,6 +39,8 @@ static bool _failed = false;   // para seguir recorriendo y reportar todos los e
 
 
 static void _shutdownSemanticAnalyzerModule() {
+    // Corre despues de destroyProgram, asi el AST no queda apuntando a simbolos liberados
+    destroySymbols();
     if (_logger != NULL) {
         destroyLogger(_logger);
         _logger = NULL;
@@ -66,6 +68,19 @@ static void _collectDeclarations(DeclarationList* declarationList){
       }
 }
 
+static Symbol* _declare(char* name, Symbol symbol){
+    if(checkSymbol(name)){
+        logError(_logger, "'%s' ya fue declarada en este scope", name);
+        _failed = true;
+        return NULL;
+    }
+    Symbol* newSymbol = addSymbol(name, symbol);
+    if(newSymbol == NULL){
+        logError(_logger, "No hay memoria para el simbolo '%s'", name);
+        _failed = true;
+    }
+    return newSymbol;
+}
 
 static int _countIdentifiers(IdentifierList* list){
       int count = 0;
@@ -208,32 +223,9 @@ static void _visitStage(Stage* stage){
 
 static void _declareIdentifierList(IdentifierList* identifierList, SymbolKind kind){
     for(IdentifierList* list = identifierList; list != NULL; list = list->next){
-        _declare(list->identifier, (Symbol){ .kind = kind });
+        list->symbol = _declare(list->identifier, (Symbol){ .kind = kind });
     }
 }
-
-static void _declare(char* name, Symbol symbol){
-    if(checkSymbol(name)){
-        logError(_logger, "'%s' ya fue declarada en este scope", name);
-        _failed = true;
-        return;
-    }
-
-    Symbol* newSymbol = malloc(sizeof(Symbol));
-    if(newSymbol == NULL){
-        logError(_logger, "No hay memoria para el simbolo '%s'", name);
-        _failed = true;
-        return;
-    }
-
-    *newSymbol = symbol;
-    if(!addSymbol(name, newSymbol)){
-        logError(_logger, "No se pudo agregar '%s' a la tabla de simbolos", name);
-        free(newSymbol);
-        _failed = true;
-    }
-}
-
 
 static void _visitExpression(Expression* expression){
     switch (expression->type){
@@ -252,7 +244,8 @@ static void _visitExpression(Expression* expression){
     case BOOLEAN_LITERAL:
         break;
     case IDENTIFIER:
-        if(lookupSymbol(expression->identifier) == NULL){
+        expression->symbol = lookupSymbol(expression->identifier);
+        if(expression->symbol == NULL){
             logError(_logger, "El identificador '%s' no fue declarado previamente", expression->identifier);
             _failed = true;
         }
@@ -268,6 +261,7 @@ static void _visitExpression(Expression* expression){
             logError(_logger, "'%s' no es una funcion", expression->functionName);
             _failed = true;
         } else {
+            expression->symbol = symbol;
             _checkArity(expression->functionName, symbol->function->parameters, expression->arguments);
         }
         _visitExpressionList(expression->arguments);
@@ -306,6 +300,7 @@ static void _visitApplyStage(ApplyStage *applyStage){
         logError(_logger, "'%s' no es un pipeline", applyStage->pipelineName);
         _failed = true;
     } else {
+        applyStage->symbol = symbol;
         _checkArity(applyStage->pipelineName, symbol->pipeline->parameters, applyStage->arguments);
     }
     _visitExpressionList(applyStage->arguments);
@@ -407,10 +402,13 @@ static void _visitForStatement(ForStatement *forStatement){
 }
 
 CompilationStatus executeSemanticAnalysis(Program* program) {
+    // Pusheo el primer scope (el global) en el stack de scopes
     if (!initScopes() || !enterScope()) {
         return OUT_OF_MEMORY;
     }
+    // Agrego en la tabla las declaraciones de funciones y pipelines
     _collectDeclarations(program->declarations);
+
     _visitProgram(program);
     destroyScopes();
     return _failed ? FAILED : SUCCEEDED;
