@@ -1,6 +1,3 @@
-// PENDIENTE: hoy el compilador lo acepta (status 0) porque el análisis
-// semántico todavía no prohíbe columnas fuera de los stages.
-
 pipeline aplicar_tasa(tasa) require @precio_base > 0 {
     MUTATE final = @precio_base * (1 + tasa)
 }

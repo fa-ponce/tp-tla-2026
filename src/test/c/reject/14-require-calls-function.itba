@@ -1,6 +1,3 @@
-// PENDIENTE: hoy el compilador lo acepta (status 0) porque el análisis
-// semántico todavía no prohíbe llamadas a funciones dentro de un require.
-
 function recargo(x) { return x * 0.05; }
 
 pipeline aplicar_tasa(tasa) require recargo(tasa) < 1 {

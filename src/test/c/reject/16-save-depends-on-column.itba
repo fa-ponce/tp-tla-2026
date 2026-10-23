@@ -1,5 +1,2 @@
-// PENDIENTE: hoy el compilador lo acepta (status 0) porque el análisis
-// semántico todavía no prohíbe columnas fuera de los stages.
-
 LOAD "in.csv"
 SAVE @nombre + ".csv"

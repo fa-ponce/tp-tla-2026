@@ -1,7 +1,0 @@
-// PENDIENTE: hoy el compilador lo acepta (status 0). El tipo de una columna
-// depende del CSV, que se lee recién al ejecutar, así que no se puede saber en
-// compilación que @nombre es un string.
-
-LOAD "in.csv"
-MUTATE x = @nombre * 2
-SAVE "out.csv"

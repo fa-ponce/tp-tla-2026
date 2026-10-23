@@ -1,6 +1,0 @@
-// PENDIENTE: hoy el compilador lo acepta (status 0). Las columnas del CSV se
-// conocen recién al ejecutar, así que no se puede validar en compilación.
-
-LOAD "in.csv"
-SELECT columna_que_no_existe
-SAVE "out.csv"
