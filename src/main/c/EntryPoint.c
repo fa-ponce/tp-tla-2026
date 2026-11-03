@@ -8,6 +8,34 @@
 #include "support/type/ModuleDestructor.h"
 #include "backend/semantic-analysis/SemanticAnalyzer.h"
 #include "backend/semantic-analysis/TypeChecker.h"
+#include <stdbool.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+#define RUN_FLAG "--run"
+
+static int _runPython(const char* path, const int argc, const char** argv){
+	pid_t pid = fork();
+	if(pid == -1){
+		return -1;
+	}
+	if(pid == 0){
+		const char* args[argc + 3];
+		args[0] = "python3";
+		args[1] = path;
+		for (int k = 0; k < argc; k++) {
+			args[k + 2] = argv[k];
+		}
+		args[argc + 2] = NULL;
+		execvp("python3", (char * const *) args);
+		_exit(127);
+	}
+	int status;
+	waitpid(pid, &status, 0);
+	return WIFEXITED(status) ? WEXITSTATUS(status) : -1;
+
+}
 
 /**
  * The main entry-point of the entire application. If you use "strtok" to
@@ -26,6 +54,9 @@ const int main(const int length, const char ** arguments) {
 		// El primer argumento es la ruta del .py generado
 		.outputPath = 1 < length ? arguments[1] : "output.py"
 	};
+	// Si el segundo argumento es --run, el .py se ejecuta despues de generarlo
+	// y todo lo que sigue se le pasa como $param
+	const bool runOutput = 2 < length && strcmp(arguments[2], RUN_FLAG) == 0;
 	ModuleDestructor moduleDestructors[] = {
 		initializeAbstractSyntaxTreeModule(),
 		initializeFlexActionsModule(lexicalAnalyzer),
@@ -52,6 +83,14 @@ const int main(const int length, const char ** arguments) {
   		}
 		else {
 			compilationStatus = executeGenerator(&compilerState);
+			if (compilationStatus == SUCCEEDED && runOutput) {
+				logInformation(logger, "Running \"%s\"...", compilerState.outputPath);
+				const int exitCode = _runPython(compilerState.outputPath, length - 3, arguments + 3);
+				if (exitCode != 0) {
+					logError(logger, "The generated program failed (exit code %d).", exitCode);
+					compilationStatus = FAILED;
+				}
+			}
 		}
 		// ...end of the Backend. -----------------------------------------------------------------
 		// ----------------------------------------------------------------------------------------
