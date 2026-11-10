@@ -1,0 +1,9 @@
+id,cliente,region,total,cantidad,pagado
+1,Ana,AMBA,15000,3,true
+2,Bruno,AMBA,8000,1,true
+3,Carla,Cuyo,22000,5,true
+4,Diego,AMBA,500,1,false
+5,Elena,NOA,12000,2,true
+6,Fede,AMBA,31000,7,true
+7,Gabi,AMBA,9500,2,true
+8,Hugo,Cuyo,4000,1,false

@@ -13,7 +13,7 @@
 #include "../Frontend.h"
 
 /** Initialize module's internal state. */
-ModuleDestructor initializeFlexActionsModule();
+ModuleDestructor initializeFlexActionsModule(LexicalAnalyzer * lexicalAnalyzer);
 
 CompilationStatus LoadLexemeAction();
 CompilationStatus SaveLexemeAction();

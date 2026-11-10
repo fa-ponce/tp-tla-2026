@@ -1,0 +1,30 @@
+let descuento_base = 0.05;
+let umbral = 10000;
+
+function bonificacion(total) {
+    return total * descuento_base;
+}
+
+pipeline con_descuento(extra) require extra >= 0 AND extra <= 0.5 {
+    MUTATE neto = IF @total > umbral
+                  THEN @total - bonificacion(@total) - @total * extra
+                  ELSE @total
+    MUTATE ticket_promedio = @total / @cantidad
+}
+
+LOAD $entrada
+FILTER @pagado = true AND (@region = "AMBA" OR @region = "Cuyo")
+APPLY con_descuento(0.10)
+{
+    FILTER @neto > umbral
+    SELECT cliente, region, neto
+    SORT BY neto DESC
+    LIMIT 2
+    SAVE "ejemplos/salida/premium.csv"
+}
+{
+    FILTER NOT @neto > umbral
+    SELECT cliente, total, ticket_promedio
+    SORT BY cliente ASC
+    SAVE "ejemplos/salida/resto.csv"
+}

@@ -1,91 +1,155 @@
 [![✗](https://img.shields.io/badge/Release-v1.0.0-ffb600.svg?style=for-the-badge)](https://github.com/fa-ponce/tp-tla-2026/releases)
 
-[![✗](https://github.com/fa-ponce/tp-tla-2026/actions/workflows/pipeline.yaml/badge.svg?branch=development)](https://github.com/fa-ponce/tp-tla-2026/actions/workflows/pipeline.yaml)
+[![✗](https://github.com/fa-ponce/tp-tla-2026/actions/workflows/ci.yaml/badge.svg?branch=development)](https://github.com/fa-ponce/tp-tla-2026/actions/workflows/ci.yaml)
 
-# Flex-Bison-Compiler
+# TabularDSL
 
-A base compiler example, developed with Flex and Bison.
+Compilador de TabularDSL, un lenguaje declarativo para describir y reutilizar transformaciones sobre archivos CSV (carga, filtrado, nuevas columnas, proyección, ordenamiento, truncado y guardado). El compilador está escrito en C con Flex y Bison, y genera un programa Python que usa únicamente la biblioteca estándar.
 
-* [Requirements](#requirements)
-* [Configuration](#configuration)
-* [Commands](#commands)
+Proyecto Especial de Autómatas, Teoría de Lenguajes y Compiladores (ITBA, 2026).
+
+* [Requisitos](#requisitos)
+* [Configuración](#configuración)
+* [Comandos](#comandos)
+* [Ejemplo](#ejemplo)
+* [El lenguaje](#el-lenguaje)
+* [Ejemplos completos](#ejemplos-completos)
 * [CI/CD](#cicd)
-* [Recommended Extensions](#recommended-extensions)
 
-## Requirements
+## Requisitos
 
-* [Docker v29.7.2](https://www.docker.com/)
+* [Docker v29.7.2](https://www.docker.com/), para construir y probar el compilador.
+* [Python 3](https://www.python.org/) (3.8 o superior), para ejecutar el programa generado. No se requiere ninguna librería externa.
 
-## Configuration
+La imagen de Docker no incluye Python: el programa `.py` generado (y la opción `--run`) se ejecutan fuera del contenedor, en una máquina con `python3` instalado.
 
-Set the following environment variables to control and configure the behaviour of the application:
+## Configuración
 
-| Name                  | Default | Description                                                                                                                                                           |
-| :-------------------- | :-----: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ENVIRONMENT`         | `Local` | The active environment name. The available environments are: `Local`, `Development` and `Production`.                                                                 |
-| `LOG_IGNORED_LEXEMES` | `true`  | When `true`, logs all of the ignored lexemes found with Flex at `DEBUGGING` level. To remove those logs from the console output set it to `false`.                    |
-| `LOGGING_LEVEL`       | `ALL`   | The minimum level to log in the console output. From lower to higher, the available levels are: `ALL`, `DEBUGGING`, `INFORMATION`, `WARNING`, `ERROR` and `CRITICAL`. |
+Variables de entorno que controlan el comportamiento del compilador:
 
-_Docker Compose_ can read the variables from an `.env` file too (see `compose.yaml` file).
+| Nombre                | Default | Descripción                                                                                                                         |
+| :-------------------- | :-----: | :---------------------------------------------------------------------------------------------------------------------------------- |
+| `ENVIRONMENT`         | `Local` | Nombre del entorno activo: `Local`, `Development` o `Production`.                                                                   |
+| `LOG_IGNORED_LEXEMES` | `true`  | Si es `true`, loguea los lexemas ignorados por Flex en nivel `DEBUGGING`.                                                           |
+| `LOGGING_LEVEL`       | `ALL`   | Nivel mínimo de log. De menor a mayor: `ALL`, `DEBUGGING`, `INFORMATION`, `WARNING`, `ERROR` y `CRITICAL`. Con `ERROR` solo se ven los errores. |
 
-## Commands
+_Docker Compose_ también las lee desde un archivo `.env` (ver `compose.yaml`).
 
-### Start
+## Comandos
 
-Rises an ephemeral container, ready to start development:
+### Iniciar
+
+Levanta un contenedor efímero listo para desarrollar:
 
 ```bash
 docker compose run --rm compiler
 ```
 
-### Build
+### Construir
 
-Builds or rebuilds the entire compiler:
+Construye (o reconstruye) el compilador completo:
 
 ```bash
 src/main/bash/build.sh
 ```
 
-### Run
-
-Compiles a program:
+### Compilar un programa
 
 ```bash
-src/main/bash/run.sh <program>
+src/main/bash/run.sh <programa.itba> [<salida.py>]
 ```
 
-where `<program>` is the path to the file that represents its entry-point.
+Compila `<programa.itba>` y escribe el programa Python en `<salida.py>` (por defecto `output.py`). Las rutas son relativas a la raíz del repositorio. Si el programa tiene errores léxicos, sintácticos o semánticos, el compilador los reporta y termina con un código distinto de 0.
 
-### Test
+Luego se ejecuta el programa generado, pasando los parámetros externos (`$nombre`) como `nombre=valor`:
 
-Executes every available unit-test under `src/test/c` folder:
+```bash
+python3 <salida.py> [nombre=valor ...]
+```
+
+### Compilar y ejecutar en un solo paso
+
+```bash
+src/main/bash/run.sh <programa.itba> <salida.py> --run [nombre=valor ...]
+```
+
+Con `--run` el compilador ejecuta el `.py` generado inmediatamente, pasándole los parámetros que siguen. Requiere `python3` en el `PATH`, así que debe usarse fuera del contenedor.
+
+### Tests
+
+Ejecuta todos los casos de prueba de `src/test/c` (`accept/` deben compilar, `reject/` deben fallar, `ignore/` se omiten):
 
 ```bash
 src/main/bash/test.sh
 ```
 
-### Stop
-
-Logout, destroy the ephemeral containers and shutdowns the cluster:
+### Detener
 
 ```bash
 exit
 docker compose down
 ```
 
-### Docker
+## Ejemplo
 
-| Command                                 | Description                                             |
-| :-------------------------------------- | :------------------------------------------------------ |
-| `docker builder prune --all`            | Removes all builds and complete build cache.            |
-| `docker compose --progress=plain build` | Forces a build or rebuild of the images in the cluster. |
-| `docker image prune`                    | Removes all of the dangling images from Docker.         |
-| `docker network prune`                  | Removes unused networks from Docker.                    |
-| `docker volume prune`                   | Removes unused volumes from Docker.                     |
+`usuarios.itba`:
+
+```
+LOAD "users.csv"
+FILTER @age >= 18 AND @status = "active"
+SELECT email
+SAVE "active_adults.csv"
+```
+
+```bash
+src/main/bash/run.sh usuarios.itba usuarios.py
+python3 usuarios.py
+```
+
+## El lenguaje
+
+Un programa es una lista opcional de declaraciones (`let`, `function`, `pipeline`) seguida de **un** script o de **un** `for`. Un script empieza con `LOAD`, aplica una secuencia de *stages* y termina con `SAVE` (o con bloques de ramificación, cada uno con su propio `SAVE`).
+
+| Construcción | Sintaxis |
+| :--- | :--- |
+| Carga / guardado | `LOAD "in.csv"` ... `SAVE "out.csv"` |
+| Filtrado | `FILTER @edad >= 18 AND NOT (@estado = "baja")` |
+| Nueva columna | `MUTATE total = @precio * @cantidad` |
+| Nueva columna condicional | `MUTATE envio = IF @precio > 1000 THEN 0 ELSE 250` (el `ELSE` es obligatorio) |
+| Proyección | `SELECT nombre, total` |
+| Ordenamiento | `SORT BY total DESC` (o `ASC`) |
+| Truncado | `LIMIT 10` |
+| Constante | `let iva = 0.21;` |
+| Función | `function doble(x) { return x * 2; }` |
+| Pipeline | `pipeline p(tasa) require tasa >= 0 { FILTER @stock > 0  MUTATE f = @precio * tasa }` |
+| Aplicar pipeline | `APPLY p(0.21)` |
+| Ramificación | `{ FILTER @x > 0  SAVE "a.csv" }  { SAVE "b.csv" }` |
+| Iteración | `for tasa in [0.1, 0.2] { ... }` o `for (tasa, ruta) in [[0.1, "a.csv"], [0.2, "b.csv"]] { ... }` |
+| Parámetro externo | `LOAD $entrada` (se pasa como `entrada=archivo.csv` al ejecutar) |
+| Comentario | `// hasta el fin de línea` |
+
+* Las palabras reservadas son *case-insensitive* (`LOAD`, `load` y `Load` son equivalentes).
+* Las columnas se referencian con `@` dentro de expresiones (`FILTER` y `MUTATE`); en `SELECT`, `SORT BY` y como destino de `MUTATE` se escriben sin `@`.
+* Tipos: `number`, `string` y `boolean`. El `+` con algún operando string concatena (`"precios_" + sufijo + ".csv"`).
+* Operadores relacionales: `=`, `!=`, `<`, `<=`, `>`, `>=`. Lógicos: `AND`, `OR`, `NOT`.
+* Los `require` de un pipeline se verifican al ejecutar el programa generado.
+* Las columnas del CSV se conocen recién al ejecutar: una columna inexistente o un tipo incompatible en una columna producen un error al ejecutar el `.py`, no al compilar.
+
+## Ejemplos completos
+
+La carpeta `ejemplos/` contiene programas que combinan pipelines, `require`, `for` con tuplas y bloques de ramificación, junto con sus CSV de entrada. Las salidas se escriben en `ejemplos/salida/`. Desde la raíz del repositorio:
+
+```bash
+src/main/bash/run.sh ejemplos/01-ventas.itba ejemplos/01-ventas.py
+python3 ejemplos/01-ventas.py entrada=ejemplos/ventas.csv
+
+src/main/bash/run.sh ejemplos/02-precios.itba ejemplos/02-precios.py
+python3 ejemplos/02-precios.py
+```
 
 ## CI/CD
 
-To trigger an automatic integration on every push or PR (_Pull Request_), you must activate _GitHub Actions_ in the _Settings_ tab. Use the following configuration:
+Para ejecutar la integración automática en cada *push*, activar _GitHub Actions_ en la pestaña _Settings_ con la siguiente configuración:
 
 | Key                                                        | Value                                               |
 | :--------------------------------------------------------- | :-------------------------------------------------- |
@@ -94,9 +158,3 @@ To trigger an automatic integration on every push or PR (_Pull Request_), you mu
 | `Artifact and log retention`                               | `30 days`                                           |
 | `Fork pull request workflows from outside collaborators`   | `Require approval for all outside collaborators`    |
 | `Workflow permissions`                                     | `Read repository contents and packages permissions` |
-
-## Recommended Extensions
-
-* [C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
-* [CMake Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools)
-* [Yash](https://marketplace.visualstudio.com/items?itemName=daohong-emilio.yash)

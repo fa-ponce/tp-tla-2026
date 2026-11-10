@@ -1,0 +1,26 @@
+let iva = 0.21;
+
+function con_impuestos(precio, recargo) { return precio * (1 + iva + recargo); }
+
+pipeline precio_final(recargo) require recargo >= 0 {
+    filter @stock > 0
+    Mutate envio = IF @precio > 100000 THEN 0 ELSE 2500
+    MUTATE final = con_impuestos(@precio, recargo) + @envio
+    select nombre, categoria, final
+}
+
+for (recargo, sufijo) in [[0, "contado"], [0.15, "cuotas"]] {
+    load "ejemplos/productos.csv"
+    apply precio_final(recargo)
+    {
+        SORT BY final DESC
+        save "ejemplos/salida/precios_" + sufijo + ".csv"
+    }
+    {
+        FILTER @categoria = "perifericos"
+        SELECT nombre, final
+        SORT BY final ASC
+        LIMIT 2
+        SAVE "ejemplos/salida/perifericos_baratos_" + sufijo + ".csv"
+    }
+}

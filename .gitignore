@@ -24,3 +24,5 @@ BisonParser.h
 FlexScanner.c
 FlexScanner.h
 /output.py
+/ejemplos/*.py
+/ejemplos/salida/*.csv
